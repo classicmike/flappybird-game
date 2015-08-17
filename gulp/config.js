@@ -1,4 +1,4 @@
-var destination = './build';
+var dest = './build';
 var src = './src';
 
 module.exports = {
@@ -6,13 +6,19 @@ module.exports = {
         debug: true,
         bundleConfigs: {
             src: src + '/js/main.js',
-            dest: src + '/js/',
+            dest: dest + '/js/',
             sourceDestinationFile: 'main.js'
         }
     },
     jshint : {
         config: {
             src: src + '/js/*.js'
+        }
+    },
+    html: {
+        config: {
+            src: src + '/index.html',
+            dest: dest
         }
     }
 };
