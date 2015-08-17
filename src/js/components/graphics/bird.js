@@ -1,12 +1,10 @@
-(function(){
-    var BirdGraphicsComponent = function(entity){
-        this.entity = entity;
-    };
+var BirdGraphicsComponent = function(entity){
+    this.entity = entity;
+};
 
-    BirdGraphicsComponent.prototype.draw = function(){
-        console.log('Drawing a bird');
-    };
+BirdGraphicsComponent.prototype.draw = function(){
+    console.log('Drawing a bird');
+};
 
-    exports.BirdGraphicsComponent = BirdGraphicsComponent;
+exports.BirdGraphicsComponent = BirdGraphicsComponent;
 
-})(jQuery);

@@ -1,4 +1,3 @@
-(function(){
 
     var graphicsComponent = require('../components/graphics/bird');
 
@@ -13,5 +12,3 @@
     };
 
     exports.Bird = Bird;
-
-})(jQuery);

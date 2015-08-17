@@ -1,4 +1,3 @@
-(function(){
     var GraphicsSystem = function(entities){
         this.entities = entities;
     };
@@ -24,4 +23,3 @@
 
     exports.GraphicsSystem = GraphicsSystem;
 
-})(jQuery);

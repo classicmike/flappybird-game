@@ -5,8 +5,8 @@ module.exports = {
     browserify: {
         debug: true,
         bundleConfigs: {
-            src: ['./src/js/*.js'],
-            dest: destination + '/js/',
+            src: src + '/js/main.js',
+            dest: src + '/js/',
             sourceDestinationFile: 'main.js'
         }
     },
