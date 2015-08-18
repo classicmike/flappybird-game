@@ -3,7 +3,6 @@ var PipeGraphicsComponent = function(entity){
 };
 
 PipeGraphicsComponent.prototype.draw = function(){
-    console.log('Drawing a pipe');
 };
 
 exports.PipeGraphicsComponent = PipeGraphicsComponent;

@@ -35,6 +35,8 @@
 
             entity.components.graphics.draw(this.context);
         }
+
+        window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;
