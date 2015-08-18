@@ -20,5 +20,12 @@ module.exports = {
             src: src + '/index.html',
             dest: dest
         }
+    },
+    styles: {
+        config: {
+            src: src + '/css/*.css',
+            dest: dest + '/css/',
+            sourceDestinationFile: 'main.css'
+        }
     }
 };

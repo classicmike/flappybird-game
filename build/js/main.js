@@ -3,8 +3,18 @@ var BirdGraphicsComponent = function(entity){
     this.entity = entity;
 };
 
-BirdGraphicsComponent.prototype.draw = function(){
-    console.log('Drawing a bird');
+BirdGraphicsComponent.prototype.draw = function(context){
+
+    // draw a circle
+    context.beginPath();
+    context.arc(100, 50, 50, 0, 2 * Math.PI);
+    context.fillStyle = "rgb(255,0,0)";
+    context.fill();
+
+    // draw a rectangle
+    context.beginPath();
+    context.fillStyle = "rgb(0,255,0)";
+    context.fillRect(0,0,10, 10);
 };
 
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
@@ -86,16 +96,32 @@ document.addEventListener('DOMContentLoaded', function(){
 },{"./flappy_bird":5}],7:[function(require,module,exports){
     var GraphicsSystem = function(entities){
         this.entities = entities;
+
+        // Canvas is where we draw
+        this.canvas = document.getElementById('main-canvas');
+
+        // Context is what we draw to
+        this.context = this.canvas.getContext('2d');
     };
 
     GraphicsSystem.prototype.run = function(){
-        // Tick the graphics system a few times to see it in action
-        for(var i = 0; i < 5; i++){
-            this.tick();
-        }
+        // continue the render loop
+        window.requestAnimationFrame(this.tick.bind(this));
     };
 
     GraphicsSystem.prototype.tick = function(){
+
+        // Set the canvas to the correct size if the window is resized
+        if(this.canvas.width !== this.canvas.offsetWidth ||
+            this.canvas.height !== this.canvas.offsetHeight){
+            this.canvas.width = this.canvas.offsetWidth;
+            this.canvas.height = this.canvas.offsetHeight;
+        }
+
+        // Clear the canvas
+        this.context.clearRect(0,0, this.canvas.width, this.canvas.height);
+
+        // Rendering goes here
         for (var i = 0; i < this.entities.length; i++){
             var entity = this.entities[i];
 
