@@ -11,10 +11,15 @@ BirdGraphicsComponent.prototype.draw = function(context){
     context.fillStyle = "rgb(255,0,0)";
     context.fill();
 
+
     // draw a rectangle
     context.beginPath();
     context.fillStyle = "rgb(0,255,0)";
     context.fillRect(0,0,10, 10);
+
+    context.translate(20, 0);
+
+
 };
 
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
@@ -26,7 +31,6 @@ var PipeGraphicsComponent = function(entity){
 };
 
 PipeGraphicsComponent.prototype.draw = function(){
-    console.log('Drawing a pipe');
 };
 
 exports.PipeGraphicsComponent = PipeGraphicsComponent;
@@ -131,6 +135,8 @@ document.addEventListener('DOMContentLoaded', function(){
 
             entity.components.graphics.draw(this.context);
         }
+
+        window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;
