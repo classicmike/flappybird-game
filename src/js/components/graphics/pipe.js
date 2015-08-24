@@ -12,7 +12,13 @@ PipeGraphicsComponent.prototype.draw = function(context){
     console.log(this.entity.height);
     //fill the path with a rectangle
     context.save();
-    context.translate(position.x, position.y);
+
+    var cornerX = position.x - this.entity.width/2;
+    var cornerY = position.y - this.entity.height/2;
+
+    context.translate(cornerX, cornerY);
+
+
     context.beginPath();
     context.rect(0, 0, this.entity.width, this.entity.height);
     context.fill();

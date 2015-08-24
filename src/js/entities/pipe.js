@@ -10,6 +10,8 @@
         physics.position.x = positionX ? positionX : Pipe.DEFAULT_POSITION_X;
         physics.position.y = positionY ? positionY : Pipe.DEFAULT_POSITION_Y;
 
+        physics.velocity.x = -0.2;
+
         //dimensions go here
         this.width = width ? width : Pipe.DEFAULT_WIDTH;
         this.height = height ? height : Pipe.DEFAULT_HEIGHT;

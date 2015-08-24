@@ -35,7 +35,13 @@ PipeGraphicsComponent.prototype.draw = function(context){
     console.log(this.entity.height);
     //fill the path with a rectangle
     context.save();
-    context.translate(position.x, position.y);
+
+    var cornerX = position.x - this.entity.width/2;
+    var cornerY = position.y - this.entity.height/2;
+
+    context.translate(cornerX, cornerY);
+
+
     context.beginPath();
     context.rect(0, 0, this.entity.width, this.entity.height);
     context.fill();
@@ -114,6 +120,8 @@ exports.PhysicsComponent = PhysicsComponent;
         physics.position.x = positionX ? positionX : Pipe.DEFAULT_POSITION_X;
         physics.position.y = positionY ? positionY : Pipe.DEFAULT_POSITION_Y;
 
+        physics.velocity.x = -0.2;
+
         //dimensions go here
         this.width = width ? width : Pipe.DEFAULT_WIDTH;
         this.height = height ? height : Pipe.DEFAULT_HEIGHT;
@@ -144,7 +152,7 @@ exports.PhysicsComponent = PhysicsComponent;
     var pipe = require('./entities/pipe');
 
     var FlappyBird = function(){
-        this.entities = [new bird.Bird(), new pipe.Pipe(0, 0, 5, 5)];
+        this.entities = [new bird.Bird(), new pipe.Pipe(0.5, 0.5, 0.5, 1)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
         this.physics = new physicsSystem.PhysicsSystem(this.entities);
         this.input = new inputSystem.InputSystem(this.entities);
@@ -216,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         this.context.restore();
 
-        //window.requestAnimationFrame(this.tick.bind(this));
+        window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;
