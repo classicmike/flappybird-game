@@ -4,6 +4,7 @@ var BirdGraphicsComponent = function(entity){
 };
 
 BirdGraphicsComponent.prototype.draw = function(context){
+    console.log('Drawing Bird Graphics');
     var position = this.entity.components.physics.position;
 
     context.save();
@@ -24,8 +25,26 @@ var PipeGraphicsComponent = function(entity){
     this.entity = entity;
 };
 
-PipeGraphicsComponent.prototype.draw = function(){
+PipeGraphicsComponent.prototype.draw = function(context){
+    console.log('Drawing pipe Graphics');
+    var position = this.entity.components.physics.position;
+
+    console.log(position.x);
+    console.log(position.y);
+    console.log(this.entity.width);
+    console.log(this.entity.height);
+    //fill the path with a rectangle
+    context.save();
+    context.translate(position.x, position.y);
+    context.beginPath();
+    context.rect(0, 0, this.entity.width, this.entity.height);
+    context.fill();
+    context.restore();
+
+
 };
+
+PipeGraphicsComponent.DEFAULT_FILL_COLOUR = '#f00';
 
 exports.PipeGraphicsComponent = PipeGraphicsComponent;
 
@@ -85,20 +104,38 @@ exports.PhysicsComponent = PhysicsComponent;
 },{"../components/graphics/bird":1,"../components/physics/physics":3}],5:[function(require,module,exports){
 
     var graphicsComponent = require('../components/graphics/pipe');
+    var physicsComponent = require('../components/physics/physics')
 
-    var Pipe = function(){
-        console.log('Creating the Pipe Entity');
+    var Pipe = function(positionX, positionY, width, height){
+        var physics = new physicsComponent.PhysicsComponent(this);
+
+
+        //put the position
+        physics.position.x = positionX ? positionX : Pipe.DEFAULT_POSITION_X;
+        physics.position.y = positionY ? positionY : Pipe.DEFAULT_POSITION_Y;
+
+        //dimensions go here
+        this.width = width ? width : Pipe.DEFAULT_WIDTH;
+        this.height = height ? height : Pipe.DEFAULT_HEIGHT;
+
 
         var graphics = new graphicsComponent.PipeGraphicsComponent(this);
 
         this.components = {
-            graphics: graphics
+            graphics: graphics,
+            physics: physics
         };
     };
 
+    Pipe.DEFAULT_POSITION_X = 0;
+    Pipe.DEFAULT_POSITION_Y = 0;
+    Pipe.DEFAULT_WIDTH = 0;
+    Pipe.DEFAULT_HEIGHT = 0;
+
     exports.Pipe = Pipe;
 
-},{"../components/graphics/pipe":2}],6:[function(require,module,exports){
+
+},{"../components/graphics/pipe":2,"../components/physics/physics":3}],6:[function(require,module,exports){
     var graphicsSystem = require('./systems/graphics');
     var physicsSystem = require('./systems/physics');
     var inputSystem = require('./systems/input');
@@ -107,7 +144,7 @@ exports.PhysicsComponent = PhysicsComponent;
     var pipe = require('./entities/pipe');
 
     var FlappyBird = function(){
-        this.entities = [new bird.Bird()];
+        this.entities = [new bird.Bird(), new pipe.Pipe(0, 0, 5, 5)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
         this.physics = new physicsSystem.PhysicsSystem(this.entities);
         this.input = new inputSystem.InputSystem(this.entities);
@@ -179,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         this.context.restore();
 
-        window.requestAnimationFrame(this.tick.bind(this));
+        //window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;

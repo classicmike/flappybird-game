@@ -42,7 +42,7 @@
 
         this.context.restore();
 
-        window.requestAnimationFrame(this.tick.bind(this));
+        //window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;

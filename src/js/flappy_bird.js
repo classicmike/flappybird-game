@@ -6,7 +6,7 @@
     var pipe = require('./entities/pipe');
 
     var FlappyBird = function(){
-        this.entities = [new bird.Bird()];
+        this.entities = [new bird.Bird(), new pipe.Pipe(0, 0, 5, 5)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
         this.physics = new physicsSystem.PhysicsSystem(this.entities);
         this.input = new inputSystem.InputSystem(this.entities);
