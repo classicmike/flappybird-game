@@ -144,10 +144,10 @@ exports.PhysicsComponent = PhysicsComponent;
     var pipeSystem = require('./systems/pipe');
 
     var bird = require('./entities/bird');
-    var pipe = require('./entities/pipe');
+
 
     var FlappyBird = function(){
-        this.entities = [new bird.Bird(), new pipe.Pipe(0.5, 0.5, 0.5, 1)];
+        this.entities = [new bird.Bird()];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
         this.physics = new physicsSystem.PhysicsSystem(this.entities);
         this.input = new inputSystem.InputSystem(this.entities);
@@ -164,7 +164,7 @@ exports.PhysicsComponent = PhysicsComponent;
     exports.FlappyBird = FlappyBird;
 
 
-},{"./entities/bird":4,"./entities/pipe":5,"./systems/graphics":8,"./systems/input":9,"./systems/physics":10,"./systems/pipe":11}],7:[function(require,module,exports){
+},{"./entities/bird":4,"./systems/graphics":8,"./systems/input":9,"./systems/physics":10,"./systems/pipe":11}],7:[function(require,module,exports){
 var flappyBird = require('./flappy_bird');
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function(){
     };
 
     GraphicsSystem.prototype.tick = function(){
-
+        console.log(this.entities);
         // Set the canvas to the correct size if the window is resized
         if(this.canvas.width !== this.canvas.offsetWidth ||
             this.canvas.height !== this.canvas.offsetHeight){
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
         this.context.restore();
 
-        //window.requestAnimationFrame(this.tick.bind(this));
+        window.requestAnimationFrame(this.tick.bind(this));
     };
 
     exports.GraphicsSystem = GraphicsSystem;
@@ -275,45 +275,48 @@ PhysicsSystem.prototype.tick = function(){
 
 exports.PhysicsSystem = PhysicsSystem;
 },{}],11:[function(require,module,exports){
+var pipe = require('../entities/pipe');
+
 var PipeSystem = function(entities){
     if(!entities){
         return;
     }
 
     this.setup(entities);
-
+    this.setEvents();
 };
 
 // function to calculate the offscreen coordinates
-PipeSystem.prototype.calculateOffScreen = function(){
-    console.log('Window Height');
-    console.log(this.canvas.width);
-    console.log(this.canvas.height);
-
-    console.log('Window Properties');
-    console.log(window.innerWidth);
-    console.log(window.innerHeight);
-
-    var offscreedWidth = this.canvas.width
+PipeSystem.prototype.calculateOffScreenX = function(){
+    return this.canvas.width/this.canvas.height;
 };
 
-PipeSystem.prototype.setEvents = function(){
-    //window.addEventListener('resize', this.calculateOffScreen.bind(this), false);
-};
+
 
 PipeSystem.prototype.setup = function(entities){
     this.canvas = document.getElementById('main-canvas');
     this.entities = entities;
     this.generationCount = 0;
 
-    this.calculateOffScreen();
-
-
+    this.calculateOffScreenX();
 };
 
 PipeSystem.prototype.run = function(){
-    this.setEvents();
+    this.generatePipe();
 };
+
+PipeSystem.prototype.setEvents = function(){
+    //window.addEventListener('resize', this.calculateOffScreen.bind(this), false);
+};
+
+PipeSystem.prototype.generatePipe = function(){
+    //generate the pipe
+    var offScreenX = this.calculateOffScreenX();
+
+    //push a new instance of a pipe onto the screen
+    this.entities.push(new pipe.Pipe(offScreenX, 0.5, 0.5, 1));
+};
+
 
 // what we need to do for each 3 seconds we need to
 // generate a pipe away from the screen
@@ -321,4 +324,4 @@ PipeSystem.prototype.run = function(){
 
 exports.PipeSystem = PipeSystem;
 
-},{}]},{},[7]);
+},{"../entities/pipe":5}]},{},[7]);
