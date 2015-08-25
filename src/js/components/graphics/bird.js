@@ -3,7 +3,6 @@ var BirdGraphicsComponent = function(entity){
 };
 
 BirdGraphicsComponent.prototype.draw = function(context){
-    console.log('Drawing Bird Graphics');
     var position = this.entity.components.physics.position;
 
     context.save();
