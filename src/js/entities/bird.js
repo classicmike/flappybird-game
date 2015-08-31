@@ -1,6 +1,7 @@
 
     var graphicsComponent = require('../components/graphics/bird');
     var physicsComponent = require('../components/physics/physics');
+    var collisionComponent = require('../components/collision/circle');
 
     var Bird = function(){
         var physics = new physicsComponent.PhysicsComponent(this);
@@ -9,10 +10,17 @@
 
         var graphics = new graphicsComponent.BirdGraphicsComponent(this);
 
+        var collision = new collisionComponent.CircleCollisionComponent(this);
+
         this.components = {
             graphics: graphics,
-            physics: physics
+            physics: physics,
+            collision: collision
         };
+    };
+
+    Bird.prototype.onCollision = function(entity){
+      console.log("Bird collided with entity: ", entity);
     };
 
     exports.Bird = Bird;

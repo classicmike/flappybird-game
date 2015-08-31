@@ -16,8 +16,6 @@ PipeSystem.prototype.calculateY = function(){
     return 1 - PipeSystem.PIPE_HEIGHT/2;
 };
 
-
-
 PipeSystem.prototype.setup = function(entities){
     this.canvas = document.getElementById('main-canvas');
     this.entities = entities;
@@ -26,7 +24,6 @@ PipeSystem.prototype.setup = function(entities){
 };
 
 PipeSystem.prototype.run = function(){
-
     setInterval(this.tick.bind(this), PipeSystem.PIPE_GENERATION_INTERVAL);
 };
 
@@ -40,7 +37,7 @@ PipeSystem.prototype.generatePipe = function(){
     if(parseInt(this.generationCount)%2 === 0){
         this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT));
     } else {
-        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, 0.75, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT));
+        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT));
     }
 
     this.generationCount++;
