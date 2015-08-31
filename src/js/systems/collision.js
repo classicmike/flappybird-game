@@ -1,5 +1,5 @@
 var CollisionSystem = function(entities){
-    this.entitties = entitites;
+    this.entities = entities;
 };
 
 CollisionSystem.prototype.tick = function(){
@@ -10,7 +10,7 @@ CollisionSystem.prototype.tick = function(){
             continue;
         }
 
-        for(var j = i+ 1; j < this.entitites.length; j++){
+        for(var j = i+ 1; j < this.entities.length; j++){
             var entityB = this.entities[j];
             if(!'collision' in entityB.components){
                 continue;

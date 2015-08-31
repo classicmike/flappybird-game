@@ -4,7 +4,7 @@ var RectCollisionComponent = function(entity, size){
     this.type = 'rect';
 };
 
-RectCollisionComponent.prototype.collidesWith = function(){
+RectCollisionComponent.prototype.collidesWith = function(entity){
     if(entity.components.collision.type === 'circle'){
         return this.collideCircle(entity);
     } else if(entity.components.collision.type === 'rect'){
@@ -19,7 +19,7 @@ RectCollisionComponent.prototype.collideCircle = function(entity){
 };
 
 RectCollisionComponent.prototype.collideRect = function(entity){
-    var positionA = this.entity.component.physics.position;
+    var positionA = this.entity.components.physics.position;
     var positionB = entity.components.physics.position;
 
     var sizeA = this.size;
@@ -27,7 +27,7 @@ RectCollisionComponent.prototype.collideRect = function(entity){
 
     var leftA = positionA.x - sizeA.x/2;
     var rightA = positionA.x + sizeA.x/2;
-    var bottomA = psotionA.y - sizeA.y/2;
+    var bottomA = positionA.y - sizeA.y/2;
     var topA = positionA.y + sizeA.y/2;
 
     var leftB = positionB.x - sizeB.x/2;
@@ -35,8 +35,7 @@ RectCollisionComponent.prototype.collideRect = function(entity){
     var bottomB = positionB.y - sizeB.y/2;
     var topB = positionB.y + sizeB.y/2;
 
-    return !(leftA > rightB || leftB > rightA || bottomA > rightB || bottomA > topA);
-
+    return !(leftA > rightB || leftB > rightA || bottomA > topB || bottomB > topA);
 
 };
 

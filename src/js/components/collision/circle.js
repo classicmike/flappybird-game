@@ -26,7 +26,7 @@ CircleCollisionComponent.prototype.collideCircle = function(entity){
         y: positionA.y - positionB.y
     };
 
-    var distanceSquared = diff.x * diff.x + diff.Y + diff.Y;
+    var distanceSquared = diff.x * diff.x + diff.y + diff.y;
     var radiusSum = radiusA + radiusB;
 
     return distanceSquared < radiusSum * radiusSum;
@@ -34,10 +34,10 @@ CircleCollisionComponent.prototype.collideCircle = function(entity){
 
 
 
-CircleCollisionComponent.prototype.collideRect = function(){
+CircleCollisionComponent.prototype.collideRect = function(entity){
     var clamp = function(value, low, high){
         if(value < low){
-            return high;
+            return low;
         }
 
         if(value > high){
@@ -45,16 +45,18 @@ CircleCollisionComponent.prototype.collideRect = function(){
         }
 
         return value;
-    }
+    };
 
     var positionA = this.entity.components.physics.position;
     var positionB = entity.components.physics.position;
     var sizeB = entity.components.collision.size;
 
+
     var closest = {
-        x: clamp(positionA.x, positionB.x - sizeB.x/2, positionB.x + sizeB.x/2),
-        y: clamp(positionA.y, positionB.y - sizeB.y/2, positionB.y + sizeB.y/2)
+        x: clamp(positionA.x, positionB.x - sizeB.x / 2, positionB.x + sizeB.x / 2),
+        y: clamp(positionA.y, positionB.y - sizeB.y / 2, positionB.y + sizeB.y / 2)
     };
+
 
     var radiusA = this.radius;
 

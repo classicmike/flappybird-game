@@ -1,8 +1,8 @@
-var collisionSytem = require('./collision');
+var collisionSystem = require('./collision');
 
 var PhysicsSystem = function(entities){
     this.entities = entities;
-    this.collisionSystem = new collisionSytem.CollisionSystem(entities)
+    this.collisionSystem = new collisionSystem.CollisionSystem(entities)
 };
 
 PhysicsSystem.prototype.run = function(){
@@ -20,6 +20,9 @@ PhysicsSystem.prototype.tick = function(){
         }
 
         entity.components.physics.update(1/60);
+
+        //perform a tick on the collision system.
+        this.collisionSystem.tick();
     }
 
 };

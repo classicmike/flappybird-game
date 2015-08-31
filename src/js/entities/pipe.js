@@ -21,7 +21,7 @@
         var graphics = new graphicsComponent.PipeGraphicsComponent(this);
 
         //colision component
-        var collision = new collisionComponent.RectCollisionComponent(this);
+        var collision = new collisionComponent.RectCollisionComponent(this, {x: this.width, y: this.height });
         //binding
         collision.onCollision = this.onCollision.bind(this);
 

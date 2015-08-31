@@ -10,7 +10,7 @@
 
         var graphics = new graphicsComponent.BirdGraphicsComponent(this);
 
-        var collision = new collisionComponent.CircleCollisionComponent(this);
+        var collision = new collisionComponent.CircleCollisionComponent(this, 0.02);
 
         this.components = {
             graphics: graphics,

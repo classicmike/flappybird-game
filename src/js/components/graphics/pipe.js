@@ -11,11 +11,11 @@ PipeGraphicsComponent.prototype.draw = function(context){
     var cornerX = position.x - this.entity.width/2;
     var cornerY = position.y - this.entity.height/2;
 
-    context.translate(cornerX, cornerY);
+    context.translate(position.x, position.y);
 
 
     context.beginPath();
-    context.rect(0, 0, this.entity.width, this.entity.height);
+    context.rect(-this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
     context.fill();
     context.restore();
 
