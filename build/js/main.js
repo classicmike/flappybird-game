@@ -1,4 +1,307 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      }
+      throw TypeError('Uncaught, unspecified "error" event.');
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        len = arguments.length;
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    len = arguments.length;
+    args = new Array(len - 1);
+    for (i = 1; i < len; i++)
+      args[i - 1] = arguments[i];
+
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    var m;
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  var ret;
+  if (!emitter._events || !emitter._events[type])
+    ret = 0;
+  else if (isFunction(emitter._events[type]))
+    ret = 1;
+  else
+    ret = emitter._events[type].length;
+  return ret;
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+},{}],2:[function(require,module,exports){
 var CircleCollisionComponent = function(entity, radius){
     this.entity = entity;
     this.radius = radius;
@@ -75,7 +378,7 @@ exports.CircleCollisionComponent = CircleCollisionComponent;
 
 
 
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 var RectCollisionComponent = function(entity, size){
     this.entity = entity;
     this.size = size;
@@ -119,7 +422,7 @@ RectCollisionComponent.prototype.collideRect = function(entity){
 
 exports.RectCollisionComponent = RectCollisionComponent;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 var BirdGraphicsComponent = function(entity){
     this.entity = entity;
 };
@@ -137,10 +440,11 @@ BirdGraphicsComponent.prototype.draw = function(context){
 
 };
 
+
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
 
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 var PipeGraphicsComponent = function(entity){
     this.entity = entity;
 };
@@ -170,7 +474,7 @@ PipeGraphicsComponent.DEFAULT_FILL_COLOUR = '#f00';
 exports.PipeGraphicsComponent = PipeGraphicsComponent;
 
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var PhysicsComponent = function(entity){
     this.entity = entity;
 
@@ -202,20 +506,23 @@ PhysicsComponent.prototype.update = function(delta){
 };
 
 exports.PhysicsComponent = PhysicsComponent;
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 
     var graphicsComponent = require('../components/graphics/bird');
     var physicsComponent = require('../components/physics/physics');
     var collisionComponent = require('../components/collision/circle');
 
-    var Bird = function(){
+    var Bird = function(bus){
         var physics = new physicsComponent.PhysicsComponent(this);
-        physics.position.y = 0.5;
+        physics.position.y = Bird.DEFAULT_POSITION_Y;
         physics.acceleration.y = -2;
 
         var graphics = new graphicsComponent.BirdGraphicsComponent(this);
 
         var collision = new collisionComponent.CircleCollisionComponent(this, 0.02);
+        collision.onCollision = this.onCollision.bind(this);
+
+        this.bus = bus;
 
         this.components = {
             graphics: graphics,
@@ -225,12 +532,35 @@ exports.PhysicsComponent = PhysicsComponent;
     };
 
     Bird.prototype.onCollision = function(entity){
-      console.log("Bird collided with entity: ", entity);
+        //reset the bird
+        this.reset();
+
+        //reset the game by removing the pipes will need to add
+        // if the entity that is being collided is a pipe
+        this.bus.emit('birdCollision');
     };
+
+    Bird.prototype.reset = function(){
+        var position = this.components.physics.position;
+
+        //set the position to the original.
+        position.x = Bird.DEFAULT_POSITION_X;
+        position.y = Bird.DEFAULT_POSITION_Y;
+
+
+        //trigger a reset event using event emitters.
+
+    };
+
+
+    //
+
+    Bird.DEFAULT_POSITION_X = 0;
+    Bird.DEFAULT_POSITION_Y = 0.5;
 
     exports.Bird = Bird;
 
-},{"../components/collision/circle":1,"../components/graphics/bird":3,"../components/physics/physics":5}],7:[function(require,module,exports){
+},{"../components/collision/circle":2,"../components/graphics/bird":4,"../components/physics/physics":6}],8:[function(require,module,exports){
 
     var graphicsComponent = require('../components/graphics/pipe');
     var physicsComponent = require('../components/physics/physics');
@@ -272,27 +602,30 @@ exports.PhysicsComponent = PhysicsComponent;
     Pipe.DEFAULT_HEIGHT = 0;
 
     Pipe.prototype.onCollision = function(entity){
-        console.log("Pipe collided with entity", entity);
-    }
+    };
 
     exports.Pipe = Pipe;
 
 
-},{"../components/collision/rect":2,"../components/graphics/pipe":4,"../components/physics/physics":5}],8:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/graphics/pipe":5,"../components/physics/physics":6}],9:[function(require,module,exports){
     var graphicsSystem = require('./systems/graphics');
     var physicsSystem = require('./systems/physics');
     var inputSystem = require('./systems/input');
     var pipeSystem = require('./systems/pipe');
 
+    //EventEmitter submodule
+    var EventEmitter = require('events').EventEmitter;
+
     var bird = require('./entities/bird');
 
 
     var FlappyBird = function(){
-        this.entities = [new bird.Bird()];
-        this.graphics = new graphicsSystem.GraphicsSystem(this.entities);
-        this.physics = new physicsSystem.PhysicsSystem(this.entities);
-        this.input = new inputSystem.InputSystem(this.entities);
-        this.pipe = new pipeSystem.PipeSystem(this.entities);
+        this.bus = new EventEmitter();
+        this.entities = [new bird.Bird(this.bus)];
+        this.graphics = new graphicsSystem.GraphicsSystem(this.entities, this.bus);
+        this.physics = new physicsSystem.PhysicsSystem(this.entities, this.bus);
+        this.input = new inputSystem.InputSystem(this.entities, this.bus);
+        this.pipe = new pipeSystem.PipeSystem(this.entities, this.bus);
     };
 
     FlappyBird.prototype.run = function(){
@@ -305,7 +638,7 @@ exports.PhysicsComponent = PhysicsComponent;
     exports.FlappyBird = FlappyBird;
 
 
-},{"./entities/bird":6,"./systems/graphics":11,"./systems/input":12,"./systems/physics":13,"./systems/pipe":14}],9:[function(require,module,exports){
+},{"./entities/bird":7,"./systems/graphics":12,"./systems/input":13,"./systems/physics":14,"./systems/pipe":15,"events":1}],10:[function(require,module,exports){
 var flappyBird = require('./flappy_bird');
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -317,8 +650,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
-},{"./flappy_bird":8}],10:[function(require,module,exports){
-var CollisionSystem = function(entities){
+},{"./flappy_bird":9}],11:[function(require,module,exports){
+var CollisionSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
 };
 
@@ -353,8 +687,9 @@ CollisionSystem.prototype.tick = function(){
 }
 
 exports.CollisionSystem = CollisionSystem;
-},{}],11:[function(require,module,exports){
-    var GraphicsSystem = function(entities){
+},{}],12:[function(require,module,exports){
+    var GraphicsSystem = function(entities, bus){
+        this.bus = bus;
         this.entities = entities;
 
         // Canvas is where we draw
@@ -403,8 +738,9 @@ exports.CollisionSystem = CollisionSystem;
     exports.GraphicsSystem = GraphicsSystem;
 
 
-},{}],12:[function(require,module,exports){
-var InputSystem = function(entities){
+},{}],13:[function(require,module,exports){
+var InputSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
 
     // canvas is where we get input forom
@@ -425,12 +761,13 @@ InputSystem.prototype.onClick = function(){
 exports.InputSystem = InputSystem;
 
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 var collisionSystem = require('./collision');
 
-var PhysicsSystem = function(entities){
+var PhysicsSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
-    this.collisionSystem = new collisionSystem.CollisionSystem(entities)
+    this.collisionSystem = new collisionSystem.CollisionSystem(entities, bus);
 };
 
 PhysicsSystem.prototype.run = function(){
@@ -456,14 +793,14 @@ PhysicsSystem.prototype.tick = function(){
 };
 
 exports.PhysicsSystem = PhysicsSystem;
-},{"./collision":10}],14:[function(require,module,exports){
+},{"./collision":11}],15:[function(require,module,exports){
 var pipe = require('../entities/pipe');
 
-var PipeSystem = function(entities){
+var PipeSystem = function(entities, bus){
     if(!entities){
         return;
     }
-    this.setup(entities);
+    this.setup(entities, bus);
 };
 
 // function to calculate the offscreen coordinates
@@ -475,15 +812,31 @@ PipeSystem.prototype.calculateY = function(){
     return 1 - PipeSystem.PIPE_HEIGHT/2;
 };
 
-PipeSystem.prototype.setup = function(entities){
+PipeSystem.prototype.setup = function(entities, bus){
+    this.bus = bus;
     this.canvas = document.getElementById('main-canvas');
     this.entities = entities;
     this.generationCount = 0;
-
+    this.setEvents();
 };
 
 PipeSystem.prototype.run = function(){
     setInterval(this.tick.bind(this), PipeSystem.PIPE_GENERATION_INTERVAL);
+};
+
+PipeSystem.prototype.setEvents = function(){
+    this.bus.on('birdCollision', this.removePipes.bind(this));
+};
+
+PipeSystem.prototype.removePipes = function(){
+    //remove all pipe events
+    for(var i=this.entities.length - 1; i >=0; i--){
+        var entity = this.entities[i];
+
+        if(entity instanceof pipe.Pipe){
+            this.entities.splice(i, 1);
+        }
+    }
 };
 
 PipeSystem.prototype.generatePipe = function(){
@@ -519,20 +872,6 @@ PipeSystem.PIPE_GENERATION_INTERVAL = 3000;
 PipeSystem.PIPE_HEIGHT = 0.5;
 PipeSystem.PIPE_WIDTH = 0.25;
 
-/**** Questions to ask Joe
- * - When you resize the window because you have to
- * draw the shape outside the canvas the interval the pipes
- * generate become either wider/narrower and you
- * will come across issues where then one pipe can
- * collide with another.
- *
- * Now what I see is just shapes of items, now if then
- * they into graphics like actual bird/pipe assets that I have to import, say from a PNG
- * ,then what do I do in that situation?
- *
- *
- */
-
 exports.PipeSystem = PipeSystem;
 
-},{"../entities/pipe":7}]},{},[9]);
+},{"../entities/pipe":8}]},{},[10]);

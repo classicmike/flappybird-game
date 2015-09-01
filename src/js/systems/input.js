@@ -1,4 +1,5 @@
-var InputSystem = function(entities){
+var InputSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
 
     // canvas is where we get input forom

@@ -1,8 +1,9 @@
 var collisionSystem = require('./collision');
 
-var PhysicsSystem = function(entities){
+var PhysicsSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
-    this.collisionSystem = new collisionSystem.CollisionSystem(entities)
+    this.collisionSystem = new collisionSystem.CollisionSystem(entities, bus);
 };
 
 PhysicsSystem.prototype.run = function(){

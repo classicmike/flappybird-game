@@ -1,10 +1,10 @@
 var pipe = require('../entities/pipe');
 
-var PipeSystem = function(entities){
+var PipeSystem = function(entities, bus){
     if(!entities){
         return;
     }
-    this.setup(entities);
+    this.setup(entities, bus);
 };
 
 // function to calculate the offscreen coordinates
@@ -16,15 +16,31 @@ PipeSystem.prototype.calculateY = function(){
     return 1 - PipeSystem.PIPE_HEIGHT/2;
 };
 
-PipeSystem.prototype.setup = function(entities){
+PipeSystem.prototype.setup = function(entities, bus){
+    this.bus = bus;
     this.canvas = document.getElementById('main-canvas');
     this.entities = entities;
     this.generationCount = 0;
-
+    this.setEvents();
 };
 
 PipeSystem.prototype.run = function(){
     setInterval(this.tick.bind(this), PipeSystem.PIPE_GENERATION_INTERVAL);
+};
+
+PipeSystem.prototype.setEvents = function(){
+    this.bus.on('birdCollision', this.removePipes.bind(this));
+};
+
+PipeSystem.prototype.removePipes = function(){
+    //remove all pipe events
+    for(var i=this.entities.length - 1; i >=0; i--){
+        var entity = this.entities[i];
+
+        if(entity instanceof pipe.Pipe){
+            this.entities.splice(i, 1);
+        }
+    }
 };
 
 PipeSystem.prototype.generatePipe = function(){
@@ -59,19 +75,5 @@ PipeSystem.prototype.tick = function(){
 PipeSystem.PIPE_GENERATION_INTERVAL = 3000;
 PipeSystem.PIPE_HEIGHT = 0.5;
 PipeSystem.PIPE_WIDTH = 0.25;
-
-/**** Questions to ask Joe
- * - When you resize the window because you have to
- * draw the shape outside the canvas the interval the pipes
- * generate become either wider/narrower and you
- * will come across issues where then one pipe can
- * collide with another.
- *
- * Now what I see is just shapes of items, now if then
- * they into graphics like actual bird/pipe assets that I have to import, say from a PNG
- * ,then what do I do in that situation?
- *
- *
- */
 
 exports.PipeSystem = PipeSystem;

@@ -39,8 +39,7 @@
     Pipe.DEFAULT_HEIGHT = 0;
 
     Pipe.prototype.onCollision = function(entity){
-        console.log("Pipe collided with entity", entity);
-    }
+    };
 
     exports.Pipe = Pipe;
 

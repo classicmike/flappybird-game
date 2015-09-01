@@ -1,4 +1,5 @@
-    var GraphicsSystem = function(entities){
+    var GraphicsSystem = function(entities, bus){
+        this.bus = bus;
         this.entities = entities;
 
         // Canvas is where we draw

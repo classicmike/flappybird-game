@@ -1,4 +1,5 @@
-var CollisionSystem = function(entities){
+var CollisionSystem = function(entities, bus){
+    this.bus = bus;
     this.entities = entities;
 };
 

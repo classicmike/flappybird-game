@@ -15,5 +15,6 @@ BirdGraphicsComponent.prototype.draw = function(context){
 
 };
 
+
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
 
