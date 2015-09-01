@@ -23,11 +23,7 @@
     };
 
     Bird.prototype.onCollision = function(entity){
-        //reset the bird
         this.reset();
-
-        //reset the game by removing the pipes will need to add
-        // if the entity that is being collided is a pipe
         this.bus.emit('birdCollision');
     };
 
@@ -37,10 +33,6 @@
         //set the position to the original.
         position.x = Bird.DEFAULT_POSITION_X;
         position.y = Bird.DEFAULT_POSITION_Y;
-
-
-        //trigger a reset event using event emitters.
-
     };
 
 
