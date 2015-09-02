@@ -8,10 +8,15 @@
 
     var bird = require('./entities/bird');
 
+    //require the walls
+    var leftWall = require('./entities/leftwall');
+    var topWall = require('./entities/topwall');
+    var bottomWall = require('./entities/bottomwall');
+
 
     var FlappyBird = function(){
         this.bus = new EventEmitter();
-        this.entities = [new bird.Bird(this.bus)];
+        this.entities = [new bird.Bird(this.bus), new leftWall.LeftWall(this.bus), new topWall.TopWall(this.bus), new bottomWall.BottomWall(this.bus)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities, this.bus);
         this.physics = new physicsSystem.PhysicsSystem(this.entities, this.bus);
         this.input = new inputSystem.InputSystem(this.entities, this.bus);

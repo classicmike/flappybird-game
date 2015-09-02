@@ -2,6 +2,8 @@
     var graphicsComponent = require('../components/graphics/bird');
     var physicsComponent = require('../components/physics/physics');
     var collisionComponent = require('../components/collision/circle');
+    var pipe = require('../entities/pipe');
+
 
     var Bird = function(bus){
         var physics = new physicsComponent.PhysicsComponent(this);
@@ -24,7 +26,10 @@
 
     Bird.prototype.onCollision = function(entity){
         this.reset();
-        this.bus.emit('birdCollision');
+
+        if(entity instanceof pipe.Pipe){
+            this.bus.emit('birdCollision');
+        }
     };
 
     Bird.prototype.reset = function(){

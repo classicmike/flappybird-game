@@ -30,11 +30,12 @@ PipeSystem.prototype.run = function(){
 
 PipeSystem.prototype.setEvents = function(){
     this.bus.on('birdCollision', this.removePipes.bind(this));
+    this.bus.on('pipeCollision', this.removePipe.bind(this));
 };
 
 PipeSystem.prototype.removePipes = function(){
     //remove all pipe events
-    for(var i=this.entities.length - 1; i >=0; i--){
+    for(var i= this.entities.length - 1; i >=0; i--){
         var entity = this.entities[i];
 
         if(entity instanceof pipe.Pipe){
@@ -51,13 +52,18 @@ PipeSystem.prototype.generatePipe = function(){
 
     //collision detection
     if(parseInt(this.generationCount)%2 === 0){
-        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT));
+        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus));
     } else {
-        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT));
+        this.entities.push(new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus));
     }
 
     this.generationCount++;
 
+};
+
+PipeSystem.prototype.removePipe = function(pipe){
+    var index = this.entities.indexOf(pipe);
+    this.entities.splice(index, 1);
 };
 
 ///

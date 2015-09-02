@@ -1,8 +1,12 @@
 var graphicsComponent = require('../components/graphics/pipe');
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
+var leftWall = require('../entities/leftwall');
 
-var Pipe = function(positionX, positionY, width, height){
+
+var Pipe = function(positionX, positionY, width, height, bus){
+    this.bus = bus;
+
     var physics = new physicsComponent.PhysicsComponent(this);
 
 
@@ -25,10 +29,11 @@ var Pipe = function(positionX, positionY, width, height){
     collision.onCollision = this.onCollision.bind(this);
 
     this.components = {
-        graphics: graphics,
         physics: physics,
-        collision: collision
+        collision: collision,
+        graphics: graphics
     };
+
 };
 
 Pipe.DEFAULT_POSITION_X = 0;
@@ -37,6 +42,9 @@ Pipe.DEFAULT_WIDTH = 0;
 Pipe.DEFAULT_HEIGHT = 0;
 
 Pipe.prototype.onCollision = function(entity){
+    if(entity instanceof leftWall.LeftWall){
+        this.bus.emit('pipeCollision', this);
+    };
 };
 
 exports.Pipe = Pipe;
