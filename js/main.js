@@ -583,7 +583,7 @@ BottomWall.prototype.setup = function(bus){
 
     this.components = {
         physics: physics,
-        collision: collision,
+        collision: collision
     };
 
     collision.onCollision = this.onCollision.bind(this);
@@ -723,7 +723,7 @@ TopWall.prototype.setup = function(bus){
 
     this.components = {
         physics: physics,
-        collision: collision,
+        collision: collision
     };
 
     collision.onCollision = this.onCollision.bind(this);
