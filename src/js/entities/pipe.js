@@ -44,7 +44,7 @@ Pipe.DEFAULT_HEIGHT = 0;
 Pipe.prototype.onCollision = function(entity){
     if(entity instanceof leftWall.LeftWall){
         this.bus.emit('pipeCollision', this);
-    };
+    }
 };
 
 exports.Pipe = Pipe;

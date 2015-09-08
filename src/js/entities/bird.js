@@ -3,6 +3,7 @@
     var physicsComponent = require('../components/physics/physics');
     var collisionComponent = require('../components/collision/circle');
     var pipe = require('../entities/pipe');
+    var pipeMarker = require('../entities/pipemarker');
 
 
     var Bird = function(bus){
@@ -25,11 +26,19 @@
     };
 
     Bird.prototype.onCollision = function(entity){
-        this.reset();
+        if(entity instanceof pipeMarker.PipeMarker){
+            //increase the score then remove the pipe marker
+            this.bus.emit('pipeMarkerCollision', entity);
+            this.bus.emit('addScore');
+        } else {
+            this.reset();
 
-        if(entity instanceof pipe.Pipe){
-            this.bus.emit('birdCollision');
+            if(entity instanceof pipe.Pipe){
+                this.bus.emit('birdCollision');
+                this.bus.emit('resetScore');
+            }
         }
+
     };
 
     Bird.prototype.reset = function(){

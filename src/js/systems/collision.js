@@ -7,13 +7,13 @@ CollisionSystem.prototype.tick = function(){
     for(var i = 0; i < this.entities.length; i++){
         var entityA = this.entities[i];
 
-        if(!'collision' in entityA.components){
+        if(!('collision' in entityA.components)){
             continue;
         }
 
         for(var j = i+ 1; j < this.entities.length; j++){
             var entityB = this.entities[j];
-            if(!'collision' in entityB.components){
+            if(!('collision' in entityB.components)){
                 continue;
             }
 
