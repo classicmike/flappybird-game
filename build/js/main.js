@@ -1100,7 +1100,7 @@ PipeSystem.prototype.removePipe = function(pipe){
 };
 
 PipeSystem.prototype.generatePipeMarker = function(pipe){
-    var newPipeMarker = new pipeMarker.PipeMarker(this.bus, pipe)
+    var newPipeMarker = new pipeMarker.PipeMarker(this.bus, pipe);
     this.entities.push(newPipeMarker);
     pipe.pipeMarker = newPipeMarker;
 };

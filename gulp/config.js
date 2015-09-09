@@ -12,7 +12,7 @@ module.exports = {
     },
     jshint : {
         config: {
-            src: src + '/js/*.js'
+            src: dest + '/js/*.js'
         }
     },
     html: {
@@ -26,6 +26,12 @@ module.exports = {
             src: src + '/css/*.css',
             dest: dest + '/css/',
             sourceDestinationFile: 'main.css'
+        }
+    },
+    images: {
+        config: {
+            src: src + '/img/**/*',
+            dest: dest + '/img'
         }
     }
 };
