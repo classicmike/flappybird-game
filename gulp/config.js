@@ -31,7 +31,21 @@ module.exports = {
     images: {
         config: {
             src: src + '/img/**/*',
-            dest: dest + '/img'
+            dest: dest + '/img/'
         }
-    }
+    },
+    watch: [
+        {
+            watchLocation: src + '/js/*.js',
+            task: 'jshint'
+        },
+        {
+            watchLocation: src + '/index.html',
+            task: 'images'
+        },
+        {
+            watchLocation: src + '/css/*.css',
+            task: 'styles'
+        }
+    ]
 };
