@@ -1,5 +1,9 @@
 var PipeGraphicsComponent = function(entity){
     this.entity = entity;
+    this.imgObject = new Image();
+    this.imgObject.src = this.entity.imgSrc;
+
+
 };
 
 PipeGraphicsComponent.prototype.draw = function(context){
@@ -8,18 +12,15 @@ PipeGraphicsComponent.prototype.draw = function(context){
     //fill the path with a rectangle
     context.save();
 
-    var cornerX = position.x - this.entity.width/2;
-    var cornerY = position.y - this.entity.height/2;
-
     context.translate(position.x, position.y);
+    context.drawImage(this.imgObject, -this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
 
-
-    context.beginPath();
-    context.rect(-this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
-    context.fill();
     context.restore();
 
 
+};
+
+PipeGraphicsComponent.prototype.onload = function(context, imgObject){
 };
 
 PipeGraphicsComponent.DEFAULT_FILL_COLOUR = '#f00';

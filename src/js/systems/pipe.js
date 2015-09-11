@@ -55,10 +55,10 @@ PipeSystem.prototype.generatePipe = function(){
 
     //collision detection
     if(parseInt(this.generationCount)%2 === 0){
-        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus);
+        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, 'up', this.bus);
         this.entities.push(newPipe);
     } else {
-        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus);
+        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, 'down', this.bus);
         this.entities.push(newPipe);
     }
 
@@ -103,8 +103,8 @@ PipeSystem.prototype.tick = function(){
     this.generatePipe();
 };
 
-PipeSystem.PIPE_GENERATION_INTERVAL = 3000;
+PipeSystem.PIPE_GENERATION_INTERVAL = 2000;
 PipeSystem.PIPE_HEIGHT = 0.5;
-PipeSystem.PIPE_WIDTH = 0.25;
+PipeSystem.PIPE_WIDTH = 0.075;
 
 exports.PipeSystem = PipeSystem;

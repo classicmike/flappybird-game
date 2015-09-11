@@ -4,7 +4,7 @@ var collisionComponent = require('../components/collision/rect');
 var leftWall = require('../entities/leftwall');
 
 
-var Pipe = function(positionX, positionY, width, height, bus){
+var Pipe = function(positionX, positionY, width, height, pipeDirection, bus){
     this.bus = bus;
 
     var physics = new physicsComponent.PhysicsComponent(this);
@@ -20,6 +20,12 @@ var Pipe = function(positionX, positionY, width, height, bus){
     this.width = width ? width : Pipe.DEFAULT_WIDTH;
     this.height = height ? height : Pipe.DEFAULT_HEIGHT;
 
+    //directions
+    if(pipeDirection === 'up'){
+        this.imgSrc = Pipe.PIPE_IMAGE_UP;
+    } else {
+        this.imgSrc = Pipe.PIPE_IMAGE_DOWN;
+    }
 
     var graphics = new graphicsComponent.PipeGraphicsComponent(this);
 
@@ -27,6 +33,9 @@ var Pipe = function(positionX, positionY, width, height, bus){
     var collision = new collisionComponent.RectCollisionComponent(this, {x: this.width, y: this.height });
     //binding
     collision.onCollision = this.onCollision.bind(this);
+
+
+
 
     this.components = {
         physics: physics,
@@ -40,6 +49,9 @@ Pipe.DEFAULT_POSITION_X = 0;
 Pipe.DEFAULT_POSITION_Y = 0;
 Pipe.DEFAULT_WIDTH = 0;
 Pipe.DEFAULT_HEIGHT = 0;
+
+Pipe.PIPE_IMAGE_UP = './img/fb_pipe_up.png';
+Pipe.PIPE_IMAGE_DOWN = './img/fb_pipe_down.png';
 
 Pipe.prototype.onCollision = function(entity){
     if(entity instanceof leftWall.LeftWall){

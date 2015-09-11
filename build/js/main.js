@@ -447,6 +447,10 @@ exports.BirdGraphicsComponent = BirdGraphicsComponent;
 },{}],5:[function(require,module,exports){
 var PipeGraphicsComponent = function(entity){
     this.entity = entity;
+    this.imgObject = new Image();
+    this.imgObject.src = this.entity.imgSrc;
+
+
 };
 
 PipeGraphicsComponent.prototype.draw = function(context){
@@ -455,18 +459,15 @@ PipeGraphicsComponent.prototype.draw = function(context){
     //fill the path with a rectangle
     context.save();
 
-    var cornerX = position.x - this.entity.width/2;
-    var cornerY = position.y - this.entity.height/2;
-
     context.translate(position.x, position.y);
+    context.drawImage(this.imgObject, -this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
 
-
-    context.beginPath();
-    context.rect(-this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
-    context.fill();
     context.restore();
 
 
+};
+
+PipeGraphicsComponent.prototype.onload = function(context, imgObject){
 };
 
 PipeGraphicsComponent.DEFAULT_FILL_COLOUR = '#f00';
@@ -660,7 +661,7 @@ var collisionComponent = require('../components/collision/rect');
 var leftWall = require('../entities/leftwall');
 
 
-var Pipe = function(positionX, positionY, width, height, bus){
+var Pipe = function(positionX, positionY, width, height, pipeDirection, bus){
     this.bus = bus;
 
     var physics = new physicsComponent.PhysicsComponent(this);
@@ -676,6 +677,12 @@ var Pipe = function(positionX, positionY, width, height, bus){
     this.width = width ? width : Pipe.DEFAULT_WIDTH;
     this.height = height ? height : Pipe.DEFAULT_HEIGHT;
 
+    //directions
+    if(pipeDirection === 'up'){
+        this.imgSrc = Pipe.PIPE_IMAGE_UP;
+    } else {
+        this.imgSrc = Pipe.PIPE_IMAGE_DOWN;
+    }
 
     var graphics = new graphicsComponent.PipeGraphicsComponent(this);
 
@@ -683,6 +690,9 @@ var Pipe = function(positionX, positionY, width, height, bus){
     var collision = new collisionComponent.RectCollisionComponent(this, {x: this.width, y: this.height });
     //binding
     collision.onCollision = this.onCollision.bind(this);
+
+
+
 
     this.components = {
         physics: physics,
@@ -696,6 +706,9 @@ Pipe.DEFAULT_POSITION_X = 0;
 Pipe.DEFAULT_POSITION_Y = 0;
 Pipe.DEFAULT_WIDTH = 0;
 Pipe.DEFAULT_HEIGHT = 0;
+
+Pipe.PIPE_IMAGE_UP = './img/fb_pipe_up.png';
+Pipe.PIPE_IMAGE_DOWN = './img/fb_pipe_down.png';
 
 Pipe.prototype.onCollision = function(entity){
     if(entity instanceof leftWall.LeftWall){
@@ -1076,10 +1089,10 @@ PipeSystem.prototype.generatePipe = function(){
 
     //collision detection
     if(parseInt(this.generationCount)%2 === 0){
-        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus);
+        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, PipeSystem.PIPE_HEIGHT - PipeSystem.PIPE_HEIGHT/2, PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, 'up', this.bus);
         this.entities.push(newPipe);
     } else {
-        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, this.bus);
+        newPipe = new pipe.Pipe(offScreenX + PipeSystem.PIPE_WIDTH/2, this.calculateY(), PipeSystem.PIPE_WIDTH, PipeSystem.PIPE_HEIGHT, 'down', this.bus);
         this.entities.push(newPipe);
     }
 
@@ -1124,9 +1137,9 @@ PipeSystem.prototype.tick = function(){
     this.generatePipe();
 };
 
-PipeSystem.PIPE_GENERATION_INTERVAL = 3000;
+PipeSystem.PIPE_GENERATION_INTERVAL = 2000;
 PipeSystem.PIPE_HEIGHT = 0.5;
-PipeSystem.PIPE_WIDTH = 0.25;
+PipeSystem.PIPE_WIDTH = 0.075;
 
 exports.PipeSystem = PipeSystem;
 
