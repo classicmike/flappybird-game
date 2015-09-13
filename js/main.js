@@ -946,7 +946,6 @@ exports.CollisionSystem = CollisionSystem;
         window.requestAnimationFrame(this.tick.bind(this));
     };
 
-    console.log('Hello');
     GraphicsSystem.prototype.tick = function(){
         // Set the canvas to the correct size if the window is resized
         if(this.canvas.width !== this.canvas.offsetWidth ||
@@ -1162,7 +1161,6 @@ UISystem.prototype.setup = function(entities, bus){
     this.bus = bus;
     this.scoreElement = document.getElementById('score');
     this.setEvents();
-    console.log('UISystem');
 };
 
 UISystem.prototype.setEvents = function(){
