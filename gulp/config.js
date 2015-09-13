@@ -36,15 +36,15 @@ module.exports = {
     },
     watch: [
         {
-            watchLocation: src + '/js/*.js',
-            task: 'jshint'
+            watchLocation: src + '/js/**/*.js',
+            task: 'browserify'
         },
         {
             watchLocation: src + '/index.html',
             task: 'images'
         },
         {
-            watchLocation: src + '/css/*.css',
+            watchLocation: src + '/css/**/*.css',
             task: 'styles'
         }
     ]

@@ -7,14 +7,14 @@ var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var transform = require('vinyl-transform');
 
-var browserifyConfig = require('../config').browserify;
-
-//browserify task
-gulp.task('browserify', function(){
-    // Browserify/bundle the css
+module.exports = function(browserifyConfig){
+	//browserify task
+	gulp.task('browserify', function(){
     browserify(browserifyConfig.bundleConfigs.src)
         .bundle()
         .pipe(source(browserifyConfig.bundleConfigs.sourceDestinationFile))
         .pipe(gulp.dest(browserifyConfig.bundleConfigs.dest));
-});
+	});
+};
+
 

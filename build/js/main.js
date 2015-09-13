@@ -554,9 +554,13 @@ exports.PhysicsComponent = PhysicsComponent;
     Bird.prototype.reset = function(){
         var position = this.components.physics.position;
 
+
         //set the position to the original.
         position.x = Bird.DEFAULT_POSITION_X;
         position.y = Bird.DEFAULT_POSITION_Y;
+
+        //set the velocity
+        this.components.physics.velocity.y = 0;
     };
 
 
@@ -942,6 +946,7 @@ exports.CollisionSystem = CollisionSystem;
         window.requestAnimationFrame(this.tick.bind(this));
     };
 
+    console.log('Hello');
     GraphicsSystem.prototype.tick = function(){
         // Set the canvas to the correct size if the window is resized
         if(this.canvas.width !== this.canvas.offsetWidth ||

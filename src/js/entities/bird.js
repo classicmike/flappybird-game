@@ -44,9 +44,13 @@
     Bird.prototype.reset = function(){
         var position = this.components.physics.position;
 
+
         //set the position to the original.
         position.x = Bird.DEFAULT_POSITION_X;
         position.y = Bird.DEFAULT_POSITION_Y;
+
+        //set the velocity
+        this.components.physics.velocity.y = 0;
     };
 
 
