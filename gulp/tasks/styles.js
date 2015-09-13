@@ -1,12 +1,11 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 
-
-var config = require('../config').styles.config;
-
-// Styles build task, concatenates all the files
-gulp.task('styles', function(){
-    gulp.src(config.src)
-        .pipe(concat(config.sourceDestinationFile))
-        .pipe(gulp.dest(config.dest));
-});
+module.exports = function(stylesConfig){
+    // Styles build task, concatenates all the files
+    gulp.task('styles', function(){
+        gulp.src(stylesConfig.src)
+            .pipe(concat(stylesConfig.sourceDestinationFile))
+            .pipe(gulp.dest(stylesConfig.dest));
+    });
+};

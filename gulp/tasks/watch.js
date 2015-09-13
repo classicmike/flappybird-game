@@ -1,11 +1,10 @@
 var gulp = require('gulp');
 
-var watch = require('../config').watch;
-
-
-gulp.task('watch', function() {
-    for(var i = 0; i < watch.length; i++){
-        var watchTask = watch[i];
-        gulp.watch(watchTask.watchLocation, [watchTask.task]);
-    }
-});
+module.exports = function(watchConfig){
+    gulp.task('watch', function() {
+        for(var i = 0; i < watchConfig.length; i++){
+            var watchTask = watchConfig[i];
+            gulp.watch(watchTask.watchLocation, [watchTask.task]);
+        }
+    });
+};

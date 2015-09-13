@@ -11,7 +11,6 @@ UISystem.prototype.setup = function(entities, bus){
     this.bus = bus;
     this.scoreElement = document.getElementById('score');
     this.setEvents();
-    console.log('UISystem');
 };
 
 UISystem.prototype.setEvents = function(){
