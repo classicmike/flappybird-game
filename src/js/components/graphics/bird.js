@@ -2,7 +2,6 @@ var BirdGraphicsComponent = function(entity){
     this.entity = entity;
     this.imgObject = new Image();
     this.imgObject.src = BirdGraphicsComponent.BIRD_IMG_SRC;
-    this.imgObject.onload = this.onload.bind(this);
 };
 
 
@@ -16,14 +15,16 @@ BirdGraphicsComponent.prototype.draw = function(context){
     context.beginPath();
     context.arc(0, 0, BirdGraphicsComponent.BIRD_RADIUS, 0, 2*Math.PI);
     context.closePath();
-    context.drawImage(this.imgObject, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
+
+    //will have to check if the bird's state is flapping or not
+    context.drawImage(this.imgObject, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
     context.restore();
 };
 
 
 
 BirdGraphicsComponent.BIRD_IMG_SRC = './img/fb_bird.png';
-BirdGraphicsComponent.BIRD_RADIUS = 0.02;
+BirdGraphicsComponent.BIRD_RADIUS = 0.06333333333;
 
 
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
