@@ -17,7 +17,9 @@ BirdGraphicsComponent.prototype.draw = function(context){
     context.closePath();
 
     //will have to check if the bird's state is flapping or not
-    context.drawImage(this.imgObject, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
+
+    //context.drawImage with 3 parameters
+    context.drawImage(this.imgObject, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 0, 0, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
     context.restore();
 };
 
