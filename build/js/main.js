@@ -423,11 +423,38 @@ RectCollisionComponent.prototype.collideRect = function(entity){
 exports.RectCollisionComponent = RectCollisionComponent;
 
 },{}],4:[function(require,module,exports){
+var BackgroundGraphicsComponent = function(entity){
+    this.entity = entity;
+    this.imgObject = new Image();
+
+    this.imgObject.src = BackgroundGraphicsComponent.DEFAULT_BACKGROUND_IMAGE;
+
+};
+
+BackgroundGraphicsComponent.prototype.draw = function(context){
+    var position = this.entity.components.physics.position;
+    context.save();
+
+    context.translate(position.x, position.y);
+
+    context.scale(1, -1);
+    context.drawImage(this.imgObject, 0, 0, this.imgObject.width, this.imgObject.height, -this.entity.width/2, -0.5, this.entity.width, this.entity.height);
+    context.restore();
+};
+
+BackgroundGraphicsComponent.DEFAULT_BACKGROUND_IMAGE = './img/flappy-background.png';
+
+exports.BackgroundGraphicsComponent = BackgroundGraphicsComponent;
+},{}],5:[function(require,module,exports){
 var BirdGraphicsComponent = function(entity){
     this.entity = entity;
     this.imgObject = new Image();
     this.imgObject.src = BirdGraphicsComponent.BIRD_IMG_SRC;
+
+    this.hasClicked = false;
 };
+
+
 
 
 //remember the width of the image in terms of pixel size is 32pixels
@@ -443,21 +470,35 @@ BirdGraphicsComponent.prototype.draw = function(context){
 
     //will have to check if the bird's state is flapping or not
 
+    context.scale(1, -1);
+
     //context.drawImage with 3 parameters
-    context.drawImage(this.imgObject, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 0, 0, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
+    if(this.hasClicked){
+        context.rotate(-Math.PI/4);
+        context.drawImage(this.imgObject, 38, 0, 38, 38, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
+    } else{
+        context.rotate(Math.PI/8);
+        context.drawImage(this.imgObject, 0, 0, 38, 38, -BirdGraphicsComponent.BIRD_RADIUS, -BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS, 2*BirdGraphicsComponent.BIRD_RADIUS);
+    }
+
+    //if the physics velocity is less than 0 then flip.
+    if(this.entity.components.physics.velocity.y < 0){
+        this.hasClicked = false;
+    }
+
     context.restore();
 };
 
 
 
 BirdGraphicsComponent.BIRD_IMG_SRC = './img/fb_bird.png';
-BirdGraphicsComponent.BIRD_RADIUS = 0.06333333333;
+BirdGraphicsComponent.BIRD_RADIUS = 0.0138888888888888;
 
 
 exports.BirdGraphicsComponent = BirdGraphicsComponent;
 
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var PipeGraphicsComponent = function(entity){
     this.entity = entity;
     this.imgObject = new Image();
@@ -475,6 +516,8 @@ PipeGraphicsComponent.prototype.draw = function(context){
     context.translate(position.x, position.y);
     context.drawImage(this.imgObject, -this.entity.width/2, -this.entity.height/2, this.entity.width, this.entity.height);
 
+
+
     context.restore();
 
 
@@ -488,7 +531,7 @@ PipeGraphicsComponent.DEFAULT_FILL_COLOUR = '#f00';
 exports.PipeGraphicsComponent = PipeGraphicsComponent;
 
 
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 var PhysicsComponent = function(entity){
     this.entity = entity;
 
@@ -520,7 +563,44 @@ PhysicsComponent.prototype.update = function(delta){
 };
 
 exports.PhysicsComponent = PhysicsComponent;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
+var physicsComponent = require('../components/physics/physics');
+var graphicsComponent = require('../components/graphics/background');
+
+
+var Background = function(positionX, positionY, width, height, bus){
+    this.setup(positionX, positionY, width, height, bus);
+};
+
+Background.prototype.setup = function(positionX, positionY, width, height, bus){
+    this.bus = bus;
+
+    var physics = new physicsComponent.PhysicsComponent(this);
+
+    physics.position.x = positionX;
+    physics.position.y = positionY;
+
+    physics.velocity.x = Background.DEFAULT_VELOCITY;
+
+
+    //determine the width and the height
+
+    this.width = width;
+    this.height = height;
+
+    var graphics = new graphicsComponent.BackgroundGraphicsComponent(this);
+
+
+    this.components = {
+        physics: physics,
+        graphics: graphics
+    };
+};
+
+Background.DEFAULT_VELOCITY = -0.2;
+
+exports.Background = Background;
+},{"../components/graphics/background":4,"../components/physics/physics":7}],9:[function(require,module,exports){
 
     var graphicsComponent = require('../components/graphics/bird');
     var physicsComponent = require('../components/physics/physics');
@@ -584,7 +664,7 @@ exports.PhysicsComponent = PhysicsComponent;
 
     exports.Bird = Bird;
 
-},{"../components/collision/circle":2,"../components/graphics/bird":4,"../components/physics/physics":6,"../entities/pipe":10,"../entities/pipemarker":11}],8:[function(require,module,exports){
+},{"../components/collision/circle":2,"../components/graphics/bird":5,"../components/physics/physics":7,"../entities/pipe":12,"../entities/pipemarker":13}],10:[function(require,module,exports){
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
 
@@ -625,7 +705,7 @@ BottomWall.prototype.onCollision = function(entity){
 
 exports.BottomWall = BottomWall;
 
-},{"../components/collision/rect":3,"../components/physics/physics":6}],9:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/physics/physics":7}],11:[function(require,module,exports){
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
 
@@ -671,7 +751,7 @@ exports.LeftWall = LeftWall;
 
 
 
-},{"../components/collision/rect":3,"../components/physics/physics":6}],10:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/physics/physics":7}],12:[function(require,module,exports){
 var graphicsComponent = require('../components/graphics/pipe');
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
@@ -736,7 +816,7 @@ Pipe.prototype.onCollision = function(entity){
 exports.Pipe = Pipe;
 
 
-},{"../components/collision/rect":3,"../components/graphics/pipe":5,"../components/physics/physics":6,"../entities/leftwall":9}],11:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/graphics/pipe":6,"../components/physics/physics":7,"../entities/leftwall":11}],13:[function(require,module,exports){
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
 
@@ -789,7 +869,7 @@ PipeMarker.GAP_FROM_PIPE = 0.01;
 exports.PipeMarker = PipeMarker;
 
 
-},{"../components/collision/rect":3,"../components/physics/physics":6,"../entities/pipe":10}],12:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/physics/physics":7,"../entities/pipe":12}],14:[function(require,module,exports){
 var physicsComponent = require('../components/physics/physics');
 var collisionComponent = require('../components/collision/rect');
 
@@ -830,12 +910,14 @@ TopWall.prototype.onCollision = function(entity){
 
 exports.TopWall = TopWall;
 
-},{"../components/collision/rect":3,"../components/physics/physics":6}],13:[function(require,module,exports){
+},{"../components/collision/rect":3,"../components/physics/physics":7}],15:[function(require,module,exports){
+    var resizeSystem = require('./systems/resize');
     var graphicsSystem = require('./systems/graphics');
     var physicsSystem = require('./systems/physics');
     var inputSystem = require('./systems/input');
     var pipeSystem = require('./systems/pipe');
     var ui = require('./systems/ui');
+    var backgroundSystem = require('./systems/background');
 
     //EventEmitter submodule
     var EventEmitter = require('events').EventEmitter;
@@ -853,13 +935,17 @@ exports.TopWall = TopWall;
     };
 
     FlappyBird.prototype.setup = function(){
+
         this.bus = new EventEmitter();
+        this.resize = new resizeSystem.ResizeSystem(this.bus);
+
         this.entities = [new bird.Bird(this.bus), new leftWall.LeftWall(this.bus), new topWall.TopWall(this.bus), new bottomWall.BottomWall(this.bus)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities, this.bus);
         this.physics = new physicsSystem.PhysicsSystem(this.entities, this.bus);
         this.input = new inputSystem.InputSystem(this.entities, this.bus);
         this.pipe = new pipeSystem.PipeSystem(this.entities, this.bus);
         this.ui = new ui.UISystem(this.entities, this.bus);
+        this.background = new backgroundSystem.BackgroundSystem(this.entities, this.bus);
 
         this.resetScore();
 
@@ -867,10 +953,12 @@ exports.TopWall = TopWall;
     };
 
     FlappyBird.prototype.run = function(){
+        this.resize.run();
         this.graphics.run();
         this.physics.run();
         this.input.run();
         this.pipe.run();
+        this.background.run();
     };
 
     FlappyBird.prototype.addScore = function(){
@@ -892,8 +980,7 @@ exports.TopWall = TopWall;
 
     exports.FlappyBird = FlappyBird;
 
-
-},{"./entities/bird":7,"./entities/bottomwall":8,"./entities/leftwall":9,"./entities/topwall":12,"./systems/graphics":16,"./systems/input":17,"./systems/physics":18,"./systems/pipe":19,"./systems/ui":20,"events":1}],14:[function(require,module,exports){
+},{"./entities/bird":9,"./entities/bottomwall":10,"./entities/leftwall":11,"./entities/topwall":14,"./systems/background":17,"./systems/graphics":19,"./systems/input":20,"./systems/physics":21,"./systems/pipe":22,"./systems/resize":23,"./systems/ui":24,"events":1}],16:[function(require,module,exports){
 var flappyBird = require('./flappy_bird');
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -905,7 +992,105 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
-},{"./flappy_bird":13}],15:[function(require,module,exports){
+},{"./flappy_bird":15}],17:[function(require,module,exports){
+var background = require('../entities/background');
+
+var BackgroundSystem = function(entities, bus, utilities){
+    if(!entities){
+        return;
+    }
+
+    this.setup(entities, bus, utilities);
+};
+
+BackgroundSystem.prototype.setup = function(entities, bus){
+    this.entities = entities;
+    this.bus = bus;
+    this.backgrounds = [];
+    this.setupEntities();
+    this.backgroundsIsResizing = false;
+};
+
+BackgroundSystem.prototype.setupEntities = function(){
+
+    //we need to create the 2 entities responsible for the backgrounds and append it to the entities.
+
+    var canvasWidth = window.innerWidth/window.innerHeight;
+    var canvasHeight = window.innerHeight/window.innerHeight;
+
+    var backgroundEntity1 = new background.Background(0, canvasHeight/2, canvasWidth, canvasHeight, this.bus);
+
+    var backgroundEntity2 = new background.Background(canvasWidth, canvasHeight/2, canvasWidth, canvasHeight, this.bus);
+
+    this.entities.unshift(backgroundEntity1, backgroundEntity2);
+    this.backgrounds.push(backgroundEntity1, backgroundEntity2);
+
+};
+
+BackgroundSystem.prototype.run = function(){
+    //interval to check and reposition backgrounds
+    window.setInterval(this.checkAndRepositionBackgrounds.bind(this), 1000/60);
+
+    //resize backgrounds on window resize.
+    this.bus.on('windowResize', this.resizeBackgrounds.bind(this));
+};
+
+
+BackgroundSystem.prototype.resizeBackgrounds = function(){
+    this.backgroundsIsResizing = true;
+    var canvasWidth = window.innerWidth/window.innerHeight;
+    var canvasHeight = window.innerHeight/window.innerHeight;
+
+    var backgroundEntity1 = this.backgrounds[0];
+    var backgroundEntity2 = this.backgrounds[1];
+
+    backgroundEntity1.components.physics.velocity.x = 0;
+    backgroundEntity2.components.physics.velocity.x = 0;
+
+    backgroundEntity1.components.physics.position.x = 0;
+    backgroundEntity1.components.physics.position.y = canvasHeight/2;
+    backgroundEntity1.components.width = canvasWidth;
+    backgroundEntity1.components.height = canvasHeight;
+
+    backgroundEntity2.components.physics.position.x = canvasWidth;
+    backgroundEntity2.components.physics.position.y = canvasHeight/2;
+    backgroundEntity2.components.width = canvasWidth;
+    backgroundEntity2.components.height = canvasHeight;
+
+
+};
+
+BackgroundSystem.prototype.checkAndRepositionBackgrounds = function(){
+    // we will need to check if the background was resizing then we would have to resume background
+    if(this.backgroundsIsResizing){
+        var backgroundEntity1 = this.backgrounds[0];
+        var backgroundEntity2 = this.backgrounds[1];
+        backgroundEntity1.components.physics.velocity.x = background.Background.DEFAULT_VELOCITY;
+        backgroundEntity2.components.physics.velocity.x = background.Background.DEFAULT_VELOCITY;
+
+        this.backgroundsIsResizing = false;
+    } else {
+        for(var i = 0; i < this.entities.length; i++){
+            var entity = this.entities[i];
+
+            var swapLimit = (window.innerWidth/window.innerHeight);
+
+            if(entity instanceof background.Background && entity.components.physics.position.x < -(swapLimit)){
+                entity.components.physics.position.x = swapLimit;
+            }
+        }
+    }
+
+
+
+};
+
+BackgroundSystem.prototype.switchBackground = function(){
+
+};
+
+exports.BackgroundSystem = BackgroundSystem;
+},{"../entities/background":8}],18:[function(require,module,exports){
 var CollisionSystem = function(entities, bus){
     this.bus = bus;
     this.entities = entities;
@@ -942,7 +1127,7 @@ CollisionSystem.prototype.tick = function(){
 }
 
 exports.CollisionSystem = CollisionSystem;
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
     var GraphicsSystem = function(entities, bus){
         this.bus = bus;
         this.entities = entities;
@@ -952,14 +1137,17 @@ exports.CollisionSystem = CollisionSystem;
 
         // Context is what we draw to
         this.context = this.canvas.getContext('2d');
+
     };
 
     GraphicsSystem.prototype.run = function(){
         // continue the render loop
         window.requestAnimationFrame(this.tick.bind(this));
+
     };
 
     GraphicsSystem.prototype.tick = function(){
+
         // Set the canvas to the correct size if the window is resized
         if(this.canvas.width !== this.canvas.offsetWidth ||
             this.canvas.height !== this.canvas.offsetHeight){
@@ -993,10 +1181,13 @@ exports.CollisionSystem = CollisionSystem;
     exports.GraphicsSystem = GraphicsSystem;
 
 
-},{}],17:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+var birdEntity = require('../entities/bird');
+
 var InputSystem = function(entities, bus){
     this.bus = bus;
     this.entities = entities;
+
 
     // canvas is where we get input forom
     this.canvas = document.getElementById('main-canvas');
@@ -1008,16 +1199,34 @@ InputSystem.prototype.run = function(){
 };
 
 InputSystem.prototype.onClick = function(){
-    var bird = this.entities[0];
+    var bird = this.getBirdFromEntities();
 
-    bird.components.physics.velocity.y = 0.7;
+    if(bird !== null){
+        bird.components.physics.velocity.y = 0.7;
+        bird.components.graphics.hasClicked = true;
+    }
 };
+
+InputSystem.prototype.getBirdFromEntities = function(){
+    for(var i = 0; i < this.entities.length; i++){
+        var entity = this.entities[i];
+
+        if(entity instanceof birdEntity.Bird){
+            return entity;
+        }
+    }
+
+    return null;
+};
+
+//
 
 exports.InputSystem = InputSystem;
 
 
-},{}],18:[function(require,module,exports){
+},{"../entities/bird":9}],21:[function(require,module,exports){
 var collisionSystem = require('./collision');
+
 
 var PhysicsSystem = function(entities, bus){
     this.bus = bus;
@@ -1043,12 +1252,14 @@ PhysicsSystem.prototype.tick = function(){
 
         //perform a tick on the collision system.
         this.collisionSystem.tick();
+
+
     }
 
 };
 
 exports.PhysicsSystem = PhysicsSystem;
-},{"./collision":15}],19:[function(require,module,exports){
+},{"./collision":18}],22:[function(require,module,exports){
 var pipe = require('../entities/pipe');
 var pipeMarker = require('../entities/pipemarker');
 
@@ -1160,7 +1371,43 @@ PipeSystem.PIPE_WIDTH = 0.075;
 
 exports.PipeSystem = PipeSystem;
 
-},{"../entities/pipe":10,"../entities/pipemarker":11}],20:[function(require,module,exports){
+},{"../entities/pipe":12,"../entities/pipemarker":13}],23:[function(require,module,exports){
+var ResizeSystem = function(bus){
+    this.setup(bus);
+};
+
+ResizeSystem.prototype.setup = function(bus){
+    this.rtime = undefined;
+    this.timeout = false;
+    this.delta = 200;
+    this.bus = bus;
+};
+
+ResizeSystem.prototype.run = function(){
+    window.addEventListener('resize', this.windowResize.bind(this));
+};
+
+ResizeSystem.prototype.windowResize = function(){
+    this.rtime = new Date();
+
+    if(this.timeout === false){
+        this.timeout = true;
+        setTimeout(this.triggerWindowResize.bind(this), this.delta);
+    }
+};
+
+ResizeSystem.prototype.triggerWindowResize = function(){
+    if(new Date() - this.rtime < this.delta){
+        setTimeout(this.triggerWindowResize.bind(this), this.delta);
+    } else {
+        this.timeout = false;
+        this.bus.emit('windowResize');
+    }
+};
+
+
+exports.ResizeSystem = ResizeSystem;
+},{}],24:[function(require,module,exports){
 var UISystem = function(entities, bus){
     if(!entities){
         return;
@@ -1189,4 +1436,4 @@ UISystem.OVERLAY_ID = 'overlay';
 UISystem.SCORE_ID = 'score';
 
 exports.UISystem = UISystem;
-},{}]},{},[14]);
+},{}]},{},[16]);

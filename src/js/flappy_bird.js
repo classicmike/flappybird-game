@@ -1,8 +1,10 @@
+    var resizeSystem = require('./systems/resize');
     var graphicsSystem = require('./systems/graphics');
     var physicsSystem = require('./systems/physics');
     var inputSystem = require('./systems/input');
     var pipeSystem = require('./systems/pipe');
     var ui = require('./systems/ui');
+    var backgroundSystem = require('./systems/background');
 
     //EventEmitter submodule
     var EventEmitter = require('events').EventEmitter;
@@ -20,13 +22,17 @@
     };
 
     FlappyBird.prototype.setup = function(){
+
         this.bus = new EventEmitter();
+        this.resize = new resizeSystem.ResizeSystem(this.bus);
+
         this.entities = [new bird.Bird(this.bus), new leftWall.LeftWall(this.bus), new topWall.TopWall(this.bus), new bottomWall.BottomWall(this.bus)];
         this.graphics = new graphicsSystem.GraphicsSystem(this.entities, this.bus);
         this.physics = new physicsSystem.PhysicsSystem(this.entities, this.bus);
         this.input = new inputSystem.InputSystem(this.entities, this.bus);
         this.pipe = new pipeSystem.PipeSystem(this.entities, this.bus);
         this.ui = new ui.UISystem(this.entities, this.bus);
+        this.background = new backgroundSystem.BackgroundSystem(this.entities, this.bus);
 
         this.resetScore();
 
@@ -34,10 +40,12 @@
     };
 
     FlappyBird.prototype.run = function(){
+        this.resize.run();
         this.graphics.run();
         this.physics.run();
         this.input.run();
         this.pipe.run();
+        this.background.run();
     };
 
     FlappyBird.prototype.addScore = function(){
@@ -58,4 +66,3 @@
     };
 
     exports.FlappyBird = FlappyBird;
-

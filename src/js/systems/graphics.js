@@ -7,14 +7,17 @@
 
         // Context is what we draw to
         this.context = this.canvas.getContext('2d');
+
     };
 
     GraphicsSystem.prototype.run = function(){
         // continue the render loop
         window.requestAnimationFrame(this.tick.bind(this));
+
     };
 
     GraphicsSystem.prototype.tick = function(){
+
         // Set the canvas to the correct size if the window is resized
         if(this.canvas.width !== this.canvas.offsetWidth ||
             this.canvas.height !== this.canvas.offsetHeight){

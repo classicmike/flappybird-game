@@ -40,7 +40,7 @@ module.exports = {
             task: 'browserify'
         },
         {
-            watchLocation: src + '/index.html',
+            watchLocation: src + '/img/**/*',
             task: 'images'
         },
         {
