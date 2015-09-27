@@ -1017,10 +1017,12 @@ BackgroundSystem.prototype.setupEntities = function(){
 
     var canvasWidth = window.innerWidth/window.innerHeight;
     var canvasHeight = window.innerHeight/window.innerHeight;
+    var offCanvasPosition = (window.innerWidth-2)/window.innerHeight;
+
 
     var backgroundEntity1 = new background.Background(0, canvasHeight/2, canvasWidth, canvasHeight, this.bus);
 
-    var backgroundEntity2 = new background.Background(canvasWidth, canvasHeight/2, canvasWidth, canvasHeight, this.bus);
+    var backgroundEntity2 = new background.Background(offCanvasPosition, canvasHeight/2, canvasWidth, canvasHeight, this.bus);
 
     this.entities.unshift(backgroundEntity1, backgroundEntity2);
     this.backgrounds.push(backgroundEntity1, backgroundEntity2);
@@ -1037,51 +1039,39 @@ BackgroundSystem.prototype.run = function(){
 
 
 BackgroundSystem.prototype.resizeBackgrounds = function(){
-    this.backgroundsIsResizing = true;
-    var canvasWidth = window.innerWidth/window.innerHeight;
+    var canvasWidth = (window.innerWidth)/window.innerHeight;
     var canvasHeight = window.innerHeight/window.innerHeight;
+
+    var offCanvasPosition = (window.innerWidth-2)/window.innerHeight;
 
     var backgroundEntity1 = this.backgrounds[0];
     var backgroundEntity2 = this.backgrounds[1];
 
-    backgroundEntity1.components.physics.velocity.x = 0;
-    backgroundEntity2.components.physics.velocity.x = 0;
 
     backgroundEntity1.components.physics.position.x = 0;
     backgroundEntity1.components.physics.position.y = canvasHeight/2;
-    backgroundEntity1.components.width = canvasWidth;
-    backgroundEntity1.components.height = canvasHeight;
+    backgroundEntity1.width = canvasWidth;
+    backgroundEntity1.height = canvasHeight;
 
-    backgroundEntity2.components.physics.position.x = canvasWidth;
+    backgroundEntity2.components.physics.position.x = offCanvasPosition;
     backgroundEntity2.components.physics.position.y = canvasHeight/2;
-    backgroundEntity2.components.width = canvasWidth;
-    backgroundEntity2.components.height = canvasHeight;
+    backgroundEntity2.width = canvasWidth;
+    backgroundEntity2.height = canvasHeight;
 
 
 };
 
 BackgroundSystem.prototype.checkAndRepositionBackgrounds = function(){
-    // we will need to check if the background was resizing then we would have to resume background
-    if(this.backgroundsIsResizing){
-        var backgroundEntity1 = this.backgrounds[0];
-        var backgroundEntity2 = this.backgrounds[1];
-        backgroundEntity1.components.physics.velocity.x = background.Background.DEFAULT_VELOCITY;
-        backgroundEntity2.components.physics.velocity.x = background.Background.DEFAULT_VELOCITY;
 
-        this.backgroundsIsResizing = false;
-    } else {
-        for(var i = 0; i < this.entities.length; i++){
-            var entity = this.entities[i];
+    for(var i = 0; i < this.entities.length; i++){
+        var entity = this.entities[i];
 
-            var swapLimit = (window.innerWidth/window.innerHeight);
+        var restartPosition = ((window.innerWidth-2)/window.innerHeight);
 
-            if(entity instanceof background.Background && entity.components.physics.position.x < -(swapLimit)){
-                entity.components.physics.position.x = swapLimit;
-            }
+        if(entity instanceof background.Background && entity.components.physics.position.x < -(restartPosition)){
+            entity.components.physics.position.x = restartPosition;
         }
     }
-
-
 
 };
 

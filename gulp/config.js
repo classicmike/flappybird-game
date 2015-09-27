@@ -34,6 +34,12 @@ module.exports = {
             dest: dest + '/img/'
         }
     },
+    fonts: {
+        config: {
+            src: src + '/fonts/**/*',
+            dest: dest + '/fonts/'
+        }
+    },
     watch: [
         {
             watchLocation: src + '/js/**/*.js',
@@ -47,5 +53,14 @@ module.exports = {
             watchLocation: src + '/css/**/*.css',
             task: 'styles'
         }
-    ]
+    ],
+    build: {
+        tasks: [
+            'jshint',
+            'html_default',
+            'styles',
+            'images',
+            'fonts'
+        ]
+    }
 };

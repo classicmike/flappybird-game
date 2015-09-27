@@ -1,7 +1,16 @@
+@font-face {
+    font-family: "flappybird";
+    font-style: normal;
+    font-weight: normal;
+    src: url("../fonts/flappy-bird/04b_19-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/flappy-bird/04b_19-webfont.woff2") format("woff2"), url("../fonts/flappy-bird/04b_19-webfont.woff") format("woff"), url("../fonts/flappy-bird/04b_19-webfont.ttf") format("truetype"), url("../fonts/flappy-bird/04b_19-webfont.svg#flappybird") format("svg");
+}
+
+
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
+    overflow: hidden;
 }
 
 canvas#main-canvas {
@@ -14,10 +23,14 @@ div#overlay {
     z-index: 1;
     top: 0;
     left: 0;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 1px 1px 1px 1px #000;
-    text-align: center;
+    padding: 0 20px;
+}
+
+div#overlay * {
+    font-size: 1.75rem;
+    font-family: "flappybird", sans-serif;
+    color: #fff;
+    text-shadow: -2px -2px 0 #59363d, 2px -2px 0 #59363d, -2px 2px 0 #59363d, 2px 2px 0 #59363d;
 }
 
 

@@ -11,4 +11,6 @@ tasks.jshint(config.jshint.config);
 tasks.images(config.images.config);
 tasks.html_default(config.html.config);
 tasks.styles(config.styles.config);
+tasks.fonts(config.fonts.config);
 tasks.watch(config.watch);
+tasks.build(config.build);
